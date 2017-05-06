@@ -30,7 +30,7 @@ var quadradinho = {
     },
     vizinhos: function() {
         vizinhos = [];
-        for (i = 0; i < tabuleiro.length -1; i++) {
+        for (i = 0; i < tabuleiro.length; i++) {
             if  ((tabuleiro[i].col >= this.col -1 && tabuleiro[i].col <= this.col +1) &&
             (tabuleiro[i].lin >= this.lin -1 && tabuleiro[i].lin <= this.lin +1) &&
             !(tabuleiro[i].lin == this.lin && tabuleiro[i].col == this.col)) {
@@ -40,9 +40,23 @@ var quadradinho = {
         return vizinhos;
     },
     revelar: function() {
-        if(!this.revelado) {
+        if(!this.revelado && !this.bomba) {
             this.revelado = true;
-            
+            if(this.proximidade == 0) {
+                vizinhos = this.vizinhos();
+                vizinhos.forEach(function(q){
+                    q.revelar();
+                });
+            }   
+        }
+        
+        if(this.bomba && !this.revelado) {
+            this.revelado = true;
+            tabuleiro.forEach(function(q) {
+                if(q.bomba) {
+                    q.revelar();
+                }
+            });
         }
     }
 };
