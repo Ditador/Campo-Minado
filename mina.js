@@ -18,7 +18,7 @@ var quadradinho = {
         if (!this.revelado) {
             fill(0,100,250);
             if(this.marcado) {
-                fill(255,100,0);
+                fill(0,0,0);
             }
             rect(this.x,this.y,this.s,this.s);
         } else {
@@ -46,6 +46,7 @@ var quadradinho = {
     revelar: function() {
         if(!this.revelado && !this.bomba) {
             this.revelado = true;
+            this.marcado = false;
             if(this.proximidade == 0) {
                 vizinhos = this.vizinhos();
                 vizinhos.forEach(function(q){
@@ -61,22 +62,29 @@ var quadradinho = {
                     q.revelar();
                 }
             });
+            gameover = true;
         }
     },
     desarmar: function() {
-        marcadas = 0;
-        for(i = 0; i < tabuleiro.length; i++) {
-            if (tabuleiro[i].marcado) {
-                marcadas++;
+        if (this.marcado) {
+            this.marcado = false;
+        }else{
+            marcadas = 0;
+            for(i = 0; i < tabuleiro.length; i++) {
+                if (tabuleiro[i].marcado) {
+                    marcadas++;
+                }
             }
-        }
-        if (marcadas < qtb) {
-            this.marcado = true;
+            
+            if (marcadas < qtb && !this.revelado) {
+                this.marcado = true;
+            }
         }
     }
 };
 
 var tabuleiro = [];
+var gameover = false;
 
 var colunas = 15;
 var linhas = 15;
@@ -89,7 +97,7 @@ for (c = 0; c < colunas; c++){
     }
 }
 
-var qtb = 20;
+var qtb = 2;
 var bombas = qtb;
 
 while (bombas > 0) {
@@ -112,6 +120,7 @@ while (bombas > 0) {
 function setup() {
     createCanvas(800,600);
     textAlign(CENTER,CENTER);
+    textSize(12);
 }
 
 function draw() {
@@ -119,10 +128,16 @@ function draw() {
     tabuleiro.forEach(function (q){
         q.d();
     });
+    
+    if (gameover) {
+        textSize(120);
+        fill(255,0,0);
+        text("Game Over",width/2,height/2);
+    }
 }
 
 function mousePressed() {
-    tabuleiro.forEach(verificaClique);
+    if (!gameover) tabuleiro.forEach(verificaClique);
 }
 function verificaClique(q) {
     cliqueX = Math.floor(mouseX / q.s);
@@ -145,7 +160,25 @@ function verificaDesarma(q) {
 }
 
 function keyPressed() {
-    if(key == ' ') {
+    if(key == ' ' && !gameover) {
         tabuleiro.forEach(verificaDesarma);
     }
+}
+
+function verificaVitoria() {
+    
+    bomb = [];
+    for(i=0;i<tabuleiro.length;i++) {
+        if(tabuleiro[i].bomba) {
+            bombas.push(tabuleiro[i]);
+        }
+    }
+    
+    for(i=0;i<bomb.length;i++) {
+        if(bomb[i].marcado){
+            return false;
+        }
+    }
+    
+    return true;
 }
