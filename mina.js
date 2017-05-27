@@ -69,13 +69,6 @@ var quadradinho = {
         if (this.marcado) {
             this.marcado = false;
         }else{
-            marcadas = 0;
-            for(i = 0; i < tabuleiro.length; i++) {
-                if (tabuleiro[i].marcado) {
-                    marcadas++;
-                }
-            }
-            
             if (marcadas < qtb && !this.revelado) {
                 this.marcado = true;
             }
@@ -97,7 +90,7 @@ for (c = 0; c < colunas; c++){
     }
 }
 
-var qtb = 2;
+var qtb = 20
 var bombas = qtb;
 
 while (bombas > 0) {
@@ -124,15 +117,37 @@ function setup() {
 }
 
 function draw() {
+    
+    marcadas = 0;
+    for(i = 0; i < tabuleiro.length; i++) {
+        if (tabuleiro[i].marcado) {
+             marcadas++;
+         }
+    }
+            
     background(255);
+    textAlign(CENTER,CENTER);
+    textSize(12);
     tabuleiro.forEach(function (q){
         q.d();
     });
     
+    textAlign(LEFT,CENTER);
+    fill(0);
+    text(qtb + " bombas no tabuleiro", 520, 20);
+    text(marcadas + " bombas marcadas", 520, 40);
+    
+    textAlign(CENTER,CENTER);
     if (gameover) {
-        textSize(120);
+        textSize(100);
         fill(255,0,0);
         text("Game Over",width/2,height/2);
+    }
+    
+    if(verificaVitoria()){
+        textSize(100);
+        fill(255,0,0);
+        text("You Won!",width/2,height/2);
     }
 }
 
@@ -170,12 +185,12 @@ function verificaVitoria() {
     bomb = [];
     for(i=0;i<tabuleiro.length;i++) {
         if(tabuleiro[i].bomba) {
-            bombas.push(tabuleiro[i]);
+            bomb.push(tabuleiro[i]);
         }
     }
     
     for(i=0;i<bomb.length;i++) {
-        if(bomb[i].marcado){
+        if(!bomb[i].marcado){
             return false;
         }
     }
